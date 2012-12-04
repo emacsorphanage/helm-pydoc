@@ -43,7 +43,7 @@
 (defun helm-c-pydoc-init ()
   (with-current-buffer (helm-candidate-buffer 'global)
     (let* ((cmd (format "python %s" helm-c-pydoc-collect-command))
-           (ret (call-process-shell-command cmd nil t t)))
+           (ret (call-process-shell-command cmd nil t)))
       (unless (= ret 0)
         (error "Failed helm-c-pydoc-init")))))
 
