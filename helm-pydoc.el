@@ -3,7 +3,7 @@
 ;; Copyright (C) 2012 by Syohei YOSHIDA
 
 ;; Author: Syohei YOSHIDA <syohex@gmail.com>
-;; URL:
+;; URL: https://github.com/syohex/emacs-helm-pydoc
 ;; Version: 0.01
 
 ;; This program is free software; you can redistribute it and/or modify
