@@ -29,7 +29,7 @@
 (require 'helm)
 
 (defgroup helm-pydoc nil
-  "Ag(Silver Searcher) command with helm interface"
+  "Pydoc with helm interface"
   :group 'helm)
 
 (defvar helm-c-pydoc-collect-command
