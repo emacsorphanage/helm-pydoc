@@ -87,8 +87,10 @@
         collect module))
 
 (defun helm-c-pydoc-construct-import-statement (modules)
-  (mapconcat (lambda (m)
-               (format "import %s" m)) modules "\n"))
+  (cond ((null (cdr modules))
+         (format "import %s\n" (car modules)))
+        (t
+         (mapconcat (lambda (m) (format "import %s" m)) modules "\n"))))
 
 (defun helm-c-pydoc-insert-import-statement (inserted)
   (save-excursion
