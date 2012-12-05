@@ -28,7 +28,7 @@
 
 * `pydoc` module
 * Import module
-    * import module
+    * import module(Insert marked candidates)
     * from module import identifier
     * from module import identifier
 * View source code
