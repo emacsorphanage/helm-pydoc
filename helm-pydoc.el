@@ -61,7 +61,7 @@
                         module module))
            (ret (call-process-shell-command cmd nil t)))
       (unless (= ret 0)
-        (error (format "Not found %s file" module)))
+        (error (format "Not found module '%s' source code" module)))
       (goto-char (point-min))
       (let ((modname (buffer-substring (point) (line-end-position))))
         (if (string-match "^\\(\.+\\.py\\)c$" modname)
