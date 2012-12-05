@@ -68,18 +68,50 @@
             (match-string 1 modname)
           modname)))))
 
-(defun helm-c-pydoc-view-source (module)
-  (let ((modfile (helm-c-pydoc-module-file module)))
+(defun helm-c-pydoc-view-source (candidate)
+  (let ((modfile (helm-c-pydoc-module-file candidate)))
     (with-current-buffer helm-c-pydoc-view-buffer
       (insert-file modfile)
       (python-mode)))
   (pop-to-buffer helm-c-pydoc-view-buffer))
+
+(defun helm-c-pydoc-check-imported (module)
+  (save-excursion
+    (let ((regexp (format "^\\s-*\\(from\\|import\\)\\s-+%s" module)))
+      (re-search-backward regexp nil t))))
+
+(defun helm-c-pydoc-collect-import-modules ()
+  (loop for module in (helm-marked-candidates)
+        when (not (helm-c-pydoc-check-imported module))
+        collect module))
+
+(defun helm-c-pydoc-construct-import-statement (modules)
+  (mapconcat (lambda (m)
+               (format "import %s" m)) modules "\n"))
+
+(defun helm-c-pydoc-skip-comments ()
+  (goto-char (point-min))
+  (loop while (string-match "^#" (buffer-substring-no-properties
+                                  (line-beginning-position)
+                                  (line-end-position)))
+        do
+        (forward-line 1)))
+
+(defun helm-c-pydoc-import-module (candidate)
+  (let* ((modules (helm-c-pydoc-collect-import-modules))
+         (statements (helm-c-pydoc-construct-import-statement modules)))
+    (save-excursion
+      (if (re-search-backward "^\\s-*\\(from\\|import\\)\\s-+" nil t)
+          (forward-line 1)
+        (helm-c-pydoc-skip-comments))
+      (insert statements))))
 
 (defvar helm-c-pydoc-source
   '((name . "helm pydoc")
     (init . helm-c-pydoc-init)
     (candidates-in-buffer)
     (action . (("Pydoc Module" . helm-c-pydoc-do-pydoc)
+               ("Import Module(s)" . helm-c-pydoc-import-module)
                ("View Source Code" . helm-c-pydoc-view-source)))
     (candidate-number-limit . 9999)))
 
