@@ -84,7 +84,8 @@
 (defun helm-c-pydoc-collect-import-modules ()
   (loop for module in (helm-marked-candidates)
         when (not (helm-c-pydoc-check-imported module))
-        collect module))
+        collect module into modules
+        finally return (sort modules #'string<)))
 
 (defun helm-c-pydoc-construct-import-statement (modules)
   (cond ((null (cdr modules))
