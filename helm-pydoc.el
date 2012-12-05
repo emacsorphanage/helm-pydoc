@@ -78,7 +78,7 @@
 
 (defun helm-c-pydoc-check-imported (module)
   (save-excursion
-    (let ((regexp (format "^\\s-*\\(from\\|import\\)\\s-+%s" module)))
+    (let ((regexp (format "^\\s-*\\(from\\|import\\)\\s-+%s\\>" module)))
       (re-search-backward regexp nil t))))
 
 (defun helm-c-pydoc-collect-import-modules ()
