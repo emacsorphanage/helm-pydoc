@@ -111,7 +111,7 @@
     (helm-c-pydoc-insert-import-statement statements)))
 
 (defun helm-c-pydoc-construct-from-import (module imports &optional name)
-  (format "from %s import %s%s"
+  (format "from %s import %s%s\n"
           module imports
           (if name
               (format " as name")
