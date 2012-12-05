@@ -55,11 +55,32 @@
       (goto-char (point-min))))
   (pop-to-buffer helm-c-pydoc-view-buffer))
 
+(defun helm-c-pydoc-module-file (module)
+  (with-temp-buffer
+    (let* ((cmd (format "python -c 'import %s;print(%s.__file__)'"
+                        module module))
+           (ret (call-process-shell-command cmd nil t)))
+      (unless (= ret 0)
+        (error (format "Not found %s file" module)))
+      (goto-char (point-min))
+      (let ((modname (buffer-substring (point) (line-end-position))))
+        (if (string-match "^\\(\.+\\.py\\)c$" modname)
+            (match-string 1 modname)
+          modname)))))
+
+(defun helm-c-pydoc-view-source (module)
+  (let ((modfile (helm-c-pydoc-module-file module)))
+    (with-current-buffer helm-c-pydoc-view-buffer
+      (insert-file modfile)
+      (python-mode)))
+  (pop-to-buffer helm-c-pydoc-view-buffer))
+
 (defvar helm-c-pydoc-source
   '((name . "helm pydoc")
     (init . helm-c-pydoc-init)
     (candidates-in-buffer)
-    (action . helm-c-pydoc-do-pydoc)
+    (action . (("Pydoc Module" . helm-c-pydoc-do-pydoc)
+               ("View Source Code" . helm-c-pydoc-view-source)))
     (candidate-number-limit . 9999)))
 
 ;;;###autoload
