@@ -7,6 +7,8 @@
 
 ![helm-pydoc](https://github.com/syohex/emacs-helm-pydoc/raw/master/image/helm-pydoc.png)
 
+![helm-pydoc-action](https://github.com/syohex/emacs-helm-pydoc/raw/master/image/helm-pydoc-action.png)
+
 
 ## Requirements
 
@@ -19,6 +21,16 @@
 `pydoc` with helm interface
 
     M-x helm-pydoc
+
+
+## Actions
+
+* `pydoc` module
+* Import module
+    * import module
+    * from module import identifier
+    * from module import identifier
+* View source code
 
 
 ## Sample Configuration
