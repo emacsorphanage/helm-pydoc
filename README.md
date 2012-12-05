@@ -26,8 +26,8 @@
 
 ## Actions
 
-* `pydoc` module
-* Import module
+* Show module document
+* Import module statement
     * import module(Insert marked candidates)
     * from module import identifier
     * from module import identifier
