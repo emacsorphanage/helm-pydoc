@@ -89,6 +89,14 @@
   (mapconcat (lambda (m)
                (format "import %s" m)) modules "\n"))
 
+(defun helm-c-pydoc-insert-import-statement (inserted)
+  (save-excursion
+    (goto-char (line-end-position))
+    (if (re-search-backward "^\\s-*\\(from\\|import\\)\\s-+" nil t)
+        (forward-line 1)
+      (helm-c-pydoc-skip-comments))
+    (insert inserted)))
+
 (defun helm-c-pydoc-skip-comments ()
   (goto-char (point-min))
   (loop while (string-match "^#" (buffer-substring-no-properties
@@ -100,18 +108,38 @@
 (defun helm-c-pydoc-import-module (candidate)
   (let* ((modules (helm-c-pydoc-collect-import-modules))
          (statements (helm-c-pydoc-construct-import-statement modules)))
-    (save-excursion
-      (if (re-search-backward "^\\s-*\\(from\\|import\\)\\s-+" nil t)
-          (forward-line 1)
-        (helm-c-pydoc-skip-comments))
-      (insert statements))))
+    (helm-c-pydoc-insert-import-statement statements)))
+
+(defun helm-c-pydoc-construct-from-import (module imports &optional name)
+  (format "from %s import %s%s"
+          module imports
+          (if name
+              (format " as name")
+            "")))
+
+(defun helm-c-pydoc-from-import-module (candidate)
+  (let* ((imports (read-string (format "Identifiers in %s: " candidate)))
+         (statement (helm-c-pydoc-construct-from-import candidate imports)))
+    (helm-c-pydoc-insert-import-statement statement)))
+
+(defun helm-c-pydoc-from-import-as-module (candidate)
+  (let* ((imports (read-string (format "Identifiers in %s: " candidate)))
+         (name (read-string (format "As name [%s]: " candidate)))
+         (statement (helm-c-pydoc-construct-from-import
+                     candidate imports name)))
+    (helm-c-pydoc-insert-import-statement statement)))
 
 (defvar helm-c-pydoc-source
   '((name . "helm pydoc")
     (init . helm-c-pydoc-init)
     (candidates-in-buffer)
     (action . (("Pydoc Module" . helm-c-pydoc-do-pydoc)
-               ("Import Module(s)" . helm-c-pydoc-import-module)
+               ("Import Module(import module)" .
+                helm-c-pydoc-import-module)
+               ("Import Module(from module import identifiers)"
+                . helm-c-pydoc-from-import-module)
+               ("Import Module(from module import identifiers as name)"
+                . helm-c-pydoc-from-import-as-module)
                ("View Source Code" . helm-c-pydoc-view-source)))
     (candidate-number-limit . 9999)))
 
