@@ -13,33 +13,33 @@
 
 ## Requirements
 
-* Emacs 22.1 or higher
+* Emacs 24 or higher
 * helm 1.0 or higher
 
 
 ## Basic Usage
 
-`pydoc` with helm interface
+#### `helm-pydoc`
 
-    M-x helm-pydoc
+`pydoc` with helm interface
 
 
 ## Actions
 
 * Show module document
+* View source code
 * Import module statement
     * import module(Insert marked candidates)
     * from module import identifier
     * from module import identifier
-* View source code
 
 
 ## Sample Configuration
 
 `git clone` helm-pydoc.el and add it to load-path.
 
-```` elisp
+```elisp
 (require 'helm-config)
 (add-to-list 'load-path "your cloned directory")
 (require 'helm-pydoc)
-````
+```
