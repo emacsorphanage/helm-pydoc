@@ -6,9 +6,9 @@
 
 ## Screenshot
 
-![helm-pydoc](image/helm-pydoc1.png)
+![helm-pydoc](image/helm-pydoc.png)
 
-![helm-pydoc-action](image/helm-pydoc2.png)
+![helm-pydoc-action](image/helm-pydoc-action.png)
 
 
 ## Requirements
