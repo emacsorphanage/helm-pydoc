@@ -6,9 +6,9 @@
 
 ## Screenshot
 
-![helm-pydoc](https://github.com/syohex/emacs-helm-pydoc/raw/master/image/helm-pydoc.png)
+![helm-pydoc](image/helm-pydoc1.png)
 
-![helm-pydoc-action](https://github.com/syohex/emacs-helm-pydoc/raw/master/image/helm-pydoc-action.png)
+![helm-pydoc-action](image/helm-pydoc2.png)
 
 
 ## Requirements
