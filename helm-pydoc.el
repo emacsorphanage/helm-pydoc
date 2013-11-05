@@ -1,6 +1,6 @@
 ;;; helm-pydoc.el --- pydoc with helm interface
 
-;; Copyright (C) 2012 by Syohei YOSHIDA
+;; Copyright (C) 2013 by Syohei YOSHIDA
 
 ;; Author: Syohei YOSHIDA <syohex@gmail.com>
 ;; URL: https://github.com/syohex/emacs-helm-pydoc
@@ -33,31 +33,40 @@
   "Pydoc with helm interface"
   :group 'helm)
 
-(defvar helm-pydoc-collect-command
+(defvar helm-pydoc--collect-command
   (if load-file-name
       (concat (file-name-directory load-file-name) "helm-pydoc.py")
     "helm-pydoc.py"))
 
-(defvar helm-pydoc-view-buffer
-  (get-buffer-create "*helm python view*"))
+(defvar helm-pydoc--view-buffer "*helm python view*")
 
-(defun helm-pydoc-init ()
+(defun helm-pydoc--collect-imported-modules ()
+  (with-helm-current-buffer
+    (save-excursion
+      (goto-char (point-min))
+      (let ((modules nil))
+        (while (re-search-forward "^\\s-*\\(?:import\\|from\\)\\s-+\\([^ \t\r\n]+\\)" nil t)
+          (push (match-string 1) modules))
+        (reverse modules)))))
+
+(defun helm-pydoc--init ()
   (with-current-buffer (helm-candidate-buffer 'global)
-    (let* ((cmd (format "python %s" helm-pydoc-collect-command))
-           (ret (call-process-shell-command cmd nil t)))
-      (unless (= ret 0)
-        (error "Failed helm-pydoc-init")))))
+    (let ((cmd (format "python %s" helm-pydoc--collect-command)))
+      (unless (zerop (call-process-shell-command cmd nil t))
+        (error "Failed helm-pydoc--init")))))
 
-(defun helm-pydoc-do-pydoc (module)
-  (with-current-buffer helm-pydoc-view-buffer
+(defun helm-pydoc--do-pydoc (module)
+  (with-current-buffer (get-buffer-create helm-pydoc--view-buffer)
+    (view-mode -1)
+    (erase-buffer)
     (let ((ret (call-process-shell-command (concat "pydoc " module) nil t)))
       (unless (zerop ret)
-        (setq tmstms ret)
         (error (format "Failed: 'pydoc %s'" module)))
-      (goto-char (point-min))))
-  (pop-to-buffer helm-pydoc-view-buffer))
+      (goto-char (point-min))
+      (view-mode +1)
+      (pop-to-buffer (current-buffer)))))
 
-(defun helm-pydoc-module-file (module)
+(defun helm-pydoc--module-file (module)
   (with-temp-buffer
     (let* ((cmd (format "python -c 'import %s;print(%s.__file__)'"
                         module module))
@@ -70,39 +79,45 @@
             (match-string 1 modname)
           modname)))))
 
-(defun helm-pydoc-view-source (candidate)
-  (let ((modfile (helm-pydoc-module-file candidate)))
-    (with-current-buffer helm-pydoc-view-buffer
-      (insert-file modfile)
-      (python-mode)))
-  (pop-to-buffer helm-pydoc-view-buffer))
+(defun helm-pydoc--view-source (candidate)
+  (let* ((modfile (helm-pydoc--module-file candidate))
+         (content (with-current-buffer (find-file-noselect modfile)
+                    (buffer-string))))
+    (with-current-buffer (get-buffer-create helm-pydoc--view-buffer)
+      (view-mode -1)
+      (erase-buffer)
+      (insert content)
+      (goto-char (point-min))
+      (python-mode)
+      (view-mode +1)
+      (pop-to-buffer (current-buffer)))))
 
-(defun helm-pydoc-check-imported (module)
+(defun helm-pydoc--check-imported (module)
   (save-excursion
     (let ((regexp (format "^\\s-*\\(from\\|import\\)\\s-+%s\\>" module)))
       (re-search-backward regexp nil t))))
 
-(defun helm-pydoc-collect-import-modules ()
+(defun helm-pydoc--collect-import-modules ()
   (loop for module in (helm-marked-candidates)
-        when (not (helm-pydoc-check-imported module))
+        when (not (helm-pydoc--check-imported module))
         collect module into modules
         finally return (sort modules #'string<)))
 
-(defun helm-pydoc-construct-import-statement (modules)
+(defun helm-pydoc--construct-import-statement (modules)
   (cond ((null (cdr modules))
          (format "import %s\n" (car modules)))
         (t
-         (mapconcat (lambda (m) (format "import %s" m)) modules "\n"))))
+         (mapconcat (lambda (m) (concat "import " m)) modules "\n"))))
 
-(defun helm-pydoc-insert-import-statement (inserted)
+(defun helm-pydoc--insert-import-statement (inserted)
   (save-excursion
     (goto-char (line-end-position))
     (if (re-search-backward "^\\s-*\\(from\\|import\\)\\s-+" nil t)
         (forward-line 1)
-      (helm-pydoc-skip-comments))
+      (helm-pydoc--skip-comments))
     (insert inserted)))
 
-(defun helm-pydoc-skip-comments ()
+(defun helm-pydoc--skip-comments ()
   (goto-char (point-min))
   (loop while (string-match "^#" (buffer-substring-no-properties
                                   (line-beginning-position)
@@ -110,49 +125,58 @@
         do
         (forward-line 1)))
 
-(defun helm-pydoc-import-module (candidate)
-  (let* ((modules (helm-pydoc-collect-import-modules))
-         (statements (helm-pydoc-construct-import-statement modules)))
-    (helm-pydoc-insert-import-statement statements)))
+(defun helm-pydoc--import-module (candidate)
+  (let* ((modules (helm-pydoc--collect-import-modules))
+         (statements (helm-pydoc--construct-import-statement modules)))
+    (helm-pydoc--insert-import-statement statements)))
 
-(defun helm-pydoc-construct-from-import (module imports &optional name)
+(defun helm-pydoc--construct-from-import (module imports &optional name)
   (format "from %s import %s%s\n"
           module imports
           (if name
               (format " as name")
             "")))
 
-(defun helm-pydoc-from-import-module (candidate)
+(defun helm-pydoc--from-import-module (candidate)
   (let* ((imports (read-string (format "Identifiers in %s: " candidate)))
-         (statement (helm-pydoc-construct-from-import candidate imports)))
-    (helm-pydoc-insert-import-statement statement)))
+         (statement (helm-pydoc--construct-from-import candidate imports)))
+    (helm-pydoc--insert-import-statement statement)))
 
-(defun helm-pydoc-from-import-as-module (candidate)
+(defun helm-pydoc--from-import-as-module (candidate)
   (let* ((imports (read-string (format "Identifiers in %s: " candidate)))
          (name (read-string (format "As name [%s]: " candidate)))
-         (statement (helm-pydoc-construct-from-import
+         (statement (helm-pydoc--construct-from-import
                      candidate imports name)))
-    (helm-pydoc-insert-import-statement statement)))
+    (helm-pydoc--insert-import-statement statement)))
 
-(defvar helm-pydoc-source
-  '((name . "helm pydoc")
-    (init . helm-pydoc-init)
-    (candidates-in-buffer)
-    (action . (("Pydoc Module" . helm-pydoc-do-pydoc)
-               ("Import Module(import module)" .
-                helm-pydoc-import-module)
+(define-helm-type-attribute 'pydoc
+  '((action . (("Pydoc Module" . helm-pydoc--do-pydoc)
+               ("View Source Code" . helm-pydoc--view-source)
+               ("Import Module(import module)" . helm-pydoc--import-module)
                ("Import Module(from module import identifiers)"
-                . helm-pydoc-from-import-module)
+                . helm-pydoc--from-import-module)
                ("Import Module(from module import identifiers as name)"
-                . helm-pydoc-from-import-as-module)
-               ("View Source Code" . helm-pydoc-view-source)))
+                . helm-pydoc--from-import-as-module)))
+    "pydoc helm attribute"))
+
+(defvar helm-pydoc--imported-source
+  '((name . "Imported Modules")
+    (candidates . helm-pydoc--collect-imported-modules)
+    (type . pydoc)
+    (candidate-number-limit . 9999)))
+
+(defvar helm-pydoc--installed-source
+  '((name . "Installed Modules")
+    (init . helm-pydoc--init)
+    (candidates-in-buffer)
+    (type . pydoc)
     (candidate-number-limit . 9999)))
 
 ;;;###autoload
 (defun helm-pydoc ()
   (interactive)
   (let ((buf (get-buffer-create "*helm pydoc*")))
-    (helm :sources '(helm-pydoc-source) :buffer buf)))
+    (helm :sources '(helm-pydoc--imported-source helm-pydoc--installed-source) :buffer buf)))
 
 (provide 'helm-pydoc)
 
