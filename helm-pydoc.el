@@ -38,8 +38,6 @@
       (concat (file-name-directory load-file-name) "helm-pydoc.py")
     "helm-pydoc.py"))
 
-(defvar helm-pydoc--view-buffer "*helm python view*")
-
 (defun helm-pydoc--collect-imported-modules ()
   (with-helm-current-buffer
     (save-excursion
@@ -55,8 +53,11 @@
       (unless (zerop (call-process-shell-command cmd nil t))
         (error "Failed helm-pydoc--init")))))
 
+(defsubst helm-pydoc--pydoc-buffer (module)
+  (get-buffer-create (format "*Pydoc %s*" module)))
+
 (defun helm-pydoc--do-pydoc (module)
-  (with-current-buffer (get-buffer-create helm-pydoc--view-buffer)
+  (with-current-buffer (helm-pydoc--pydoc-buffer module)
     (view-mode -1)
     (erase-buffer)
     (let ((cmd (concat "pydoc " module)))
@@ -78,11 +79,14 @@
             (match-string 1 modname)
           modname)))))
 
+(defsubst helm-pydoc--pydoc-src-buffer (module)
+  (get-buffer-create (format "*Pydoc Source %s*" module)))
+
 (defun helm-pydoc--view-source (candidate)
   (let* ((modfile (helm-pydoc--module-file candidate))
          (content (with-current-buffer (find-file-noselect modfile)
                     (buffer-string))))
-    (with-current-buffer (get-buffer-create helm-pydoc--view-buffer)
+    (with-current-buffer (helm-pydoc--pydoc-src-buffer candidate)
       (view-mode -1)
       (erase-buffer)
       (insert content)
