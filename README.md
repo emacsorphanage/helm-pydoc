@@ -36,10 +36,8 @@
 
 ## Sample Configuration
 
-`git clone` helm-pydoc.el and add it to load-path.
-
 ```elisp
-(require 'helm-config)
-(add-to-list 'load-path "your cloned directory")
-(require 'helm-pydoc)
+(eval-after-load "python"
+  '(progn
+     (define-key pythom-mode-map (kbd "C-c C-d") 'helm-pydoc)))
 ```
