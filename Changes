@@ -1,4 +1,10 @@
 Revision history for helm-pydoc.el
 
+Revision 0.02 2013/11/06 syohex
+   - Re-factoring
+   - Fix python script for PEP8
+   - Use buffer per module
+   - Add input history feature
+
 Revision 0.01 2013/11/06 syohex
    - Initial version
