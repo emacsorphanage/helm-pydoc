@@ -171,11 +171,14 @@
     (type . pydoc)
     (candidate-number-limit . 9999)))
 
+(defvar helm-pydoc--history nil)
+
 ;;;###autoload
 (defun helm-pydoc ()
   (interactive)
   (helm :sources '(helm-pydoc--imported-source helm-pydoc--installed-source)
-        :buffer (get-buffer-create "*helm pydoc*")))
+        :buffer (get-buffer-create "*helm pydoc*")
+        :history 'helm-pydoc--history))
 
 (provide 'helm-pydoc)
 
