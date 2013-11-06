@@ -59,9 +59,9 @@
   (with-current-buffer (get-buffer-create helm-pydoc--view-buffer)
     (view-mode -1)
     (erase-buffer)
-    (let ((ret (call-process-shell-command (concat "pydoc " module) nil t)))
-      (unless (zerop ret)
-        (error (format "Failed: 'pydoc %s'" module)))
+    (let ((cmd (concat "pydoc " module)))
+      (unless (zerop (call-process-shell-command cmd nil t))
+        (error (format "Failed: '%s'" cmd)))
       (goto-char (point-min))
       (view-mode +1)
       (pop-to-buffer (current-buffer)))))
@@ -69,9 +69,8 @@
 (defun helm-pydoc--module-file (module)
   (with-temp-buffer
     (let* ((cmd (format "python -c 'import %s;print(%s.__file__)'"
-                        module module))
-           (ret (call-process-shell-command cmd nil t)))
-      (unless (= ret 0)
+                        module module)))
+      (unless (zerop (call-process-shell-command cmd nil t))
         (error (format "Not found module '%s' source code" module)))
       (goto-char (point-min))
       (let ((modname (buffer-substring (point) (line-end-position))))
@@ -94,7 +93,7 @@
 
 (defun helm-pydoc--check-imported (module)
   (save-excursion
-    (let ((regexp (format "^\\s-*\\(from\\|import\\)\\s-+%s\\>" module)))
+    (let ((regexp (format "^\\s-*\\(?:from\\|import\\)\\s-+%s\\>" module)))
       (re-search-backward regexp nil t))))
 
 (defun helm-pydoc--collect-import-modules ()
@@ -112,7 +111,7 @@
 (defun helm-pydoc--insert-import-statement (inserted)
   (save-excursion
     (goto-char (line-end-position))
-    (if (re-search-backward "^\\s-*\\(from\\|import\\)\\s-+" nil t)
+    (if (re-search-backward "^\\s-*\\(?:from\\|import\\)\\s-+" nil t)
         (forward-line 1)
       (helm-pydoc--skip-comments))
     (insert inserted)))
@@ -175,8 +174,8 @@
 ;;;###autoload
 (defun helm-pydoc ()
   (interactive)
-  (let ((buf (get-buffer-create "*helm pydoc*")))
-    (helm :sources '(helm-pydoc--imported-source helm-pydoc--installed-source) :buffer buf)))
+  (helm :sources '(helm-pydoc--imported-source helm-pydoc--installed-source)
+        :buffer (get-buffer-create "*helm pydoc*")))
 
 (provide 'helm-pydoc)
 
