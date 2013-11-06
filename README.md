@@ -16,6 +16,14 @@
 * Emacs 24 or higher
 * helm 1.0 or higher
 
+## Installation
+
+You can install `helm-pydoc.el` from [MELPA](http://melpa.milkbox.net/) with `package.el`
+
+```
+ M-x package-install helm-pydoc
+```
+
 
 ## Basic Usage
 
