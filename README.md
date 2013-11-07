@@ -34,7 +34,7 @@ You can install `helm-pydoc.el` from [MELPA](http://melpa.milkbox.net/) with `pa
 
 ## Actions
 
-* Show module document
+* View module document
 * View source code
 * Import module statement
     * import module(Insert marked candidates)
