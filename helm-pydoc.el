@@ -33,10 +33,24 @@
   "Pydoc with helm interface"
   :group 'helm)
 
+(defcustom helm-pydoc-virtualenv "venv"
+  "Directory name containing virtualenv."
+  :type 'string
+  :group 'helm-pydoc)
+
 (defvar helm-pydoc--collect-command
   (if load-file-name
       (concat (file-name-directory load-file-name) "helm-pydoc.py")
     "helm-pydoc.py"))
+
+(defun helm-pydoc--python ()
+  (with-helm-current-buffer
+    (let* ((file (or (buffer-file-name) default-directory))
+           (venv (locate-dominating-file file helm-pydoc-virtualenv)))
+      (if venv
+          (concat (expand-file-name (file-name-as-directory venv))
+                  helm-pydoc-virtualenv "/bin/python")
+        "python"))))
 
 (defun helm-pydoc--collect-imported-modules ()
   (with-helm-current-buffer
@@ -49,7 +63,7 @@
 
 (defun helm-pydoc--init ()
   (with-current-buffer (helm-candidate-buffer 'global)
-    (let ((cmd (format "python %s" helm-pydoc--collect-command)))
+    (let ((cmd (concat (helm-pydoc--python) " " helm-pydoc--collect-command)))
       (unless (zerop (call-process-shell-command cmd nil t))
         (error "Failed helm-pydoc--init")))))
 
@@ -60,7 +74,7 @@
   (with-current-buffer (helm-pydoc--pydoc-buffer module)
     (view-mode -1)
     (erase-buffer)
-    (let ((cmd (concat "pydoc " module)))
+    (let ((cmd (concat (helm-pydoc--python) " -m pydoc " module)))
       (unless (zerop (call-process-shell-command cmd nil t))
         (error (format "Failed: '%s'" cmd)))
       (goto-char (point-min))
@@ -69,8 +83,8 @@
 
 (defun helm-pydoc--module-file (module)
   (with-temp-buffer
-    (let* ((cmd (format "python -c 'import %s;print(%s.__file__)'"
-                        module module)))
+    (let* ((cmd (format "%s -c 'import %s;print(%s.__file__)'"
+                        (helm-pydoc--python) module module)))
       (unless (zerop (call-process-shell-command cmd nil t))
         (error (format "Not found module '%s' source code" module)))
       (goto-char (point-min))
