@@ -31,6 +31,12 @@ You can install `helm-pydoc.el` from [MELPA](http://melpa.milkbox.net/) with `pa
 
 `pydoc` with helm interface
 
+## Customize Variable
+
+#### `helm-pydoc-virtualenv`(Default `"venv"`)
+
+Directory name of virtualenv. Use virtualenv `python` if this name directory
+is found in this directory hierarchy.
 
 ## Actions
 
