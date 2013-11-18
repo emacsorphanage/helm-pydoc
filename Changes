@@ -1,5 +1,8 @@
 Revision history for helm-pydoc.el
 
+Revision 0.03 2013/11/19 syohex
+   - Support virtualenv(Thanks proofit404)
+
 Revision 0.02 2013/11/06 syohex
    - Re-factoring
    - Fix python script for PEP8
