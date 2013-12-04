@@ -93,21 +93,9 @@
             (match-string 1 modname)
           modname)))))
 
-(defsubst helm-pydoc--pydoc-src-buffer (module)
-  (get-buffer-create (format "*Pydoc Source %s*" module)))
-
 (defun helm-pydoc--view-source (candidate)
-  (let* ((modfile (helm-pydoc--module-file candidate))
-         (content (with-current-buffer (find-file-noselect modfile)
-                    (buffer-string))))
-    (with-current-buffer (helm-pydoc--pydoc-src-buffer candidate)
-      (view-mode -1)
-      (erase-buffer)
-      (insert content)
-      (goto-char (point-min))
-      (python-mode)
-      (view-mode +1)
-      (pop-to-buffer (current-buffer)))))
+  (let ((modfile (helm-pydoc--module-file candidate)))
+    (find-file-read-only-other-window modfile)))
 
 (defun helm-pydoc--check-imported (module)
   (save-excursion
