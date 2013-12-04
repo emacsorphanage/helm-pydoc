@@ -1,5 +1,8 @@
 Revision history for helm-pydoc.el
 
+Revision 0.04 2013/12/05 syohex
+   - Change way of opening source file(Thanks proofit404)
+
 Revision 0.03 2013/11/19 syohex
    - Support virtualenv(Thanks proofit404)
 
