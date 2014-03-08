@@ -1,4 +1,4 @@
-;;; helm-pydoc.el --- pydoc with helm interface
+;;; helm-pydoc.el --- pydoc with helm interface -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2013 by Syohei YOSHIDA
 
@@ -129,7 +129,7 @@
            do
            (forward-line 1)))
 
-(defun helm-pydoc--import-module (candidate)
+(defun helm-pydoc--import-module (_candidate)
   (let* ((modules (helm-pydoc--collect-import-modules))
          (statements (helm-pydoc--construct-import-statement modules)))
     (helm-pydoc--insert-import-statement statements)))
