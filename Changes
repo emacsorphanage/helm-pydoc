@@ -1,5 +1,9 @@
 Revision history for helm-pydoc.el
 
+Revision 0.05 2014/03/08 syohex
+   - Switch cl-lib
+   - Enable lexical binding
+
 Revision 0.04 2013/12/05 syohex
    - Change way of opening source file(Thanks proofit404)
 
