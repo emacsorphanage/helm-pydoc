@@ -1,5 +1,8 @@
 Revision history for helm-pydoc.el
 
+Revision 0.06 2014/07/02 syohex
+   - Re-factoring
+
 Revision 0.05 2014/03/08 syohex
    - Switch cl-lib
    - Enable lexical binding
