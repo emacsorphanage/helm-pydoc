@@ -25,7 +25,6 @@
 ;;; Code:
 
 (require 'cl-lib)
-
 (require 'helm)
 
 (defgroup helm-pydoc nil
@@ -57,14 +56,14 @@
       (goto-char (point-min))
       (let ((modules nil))
         (while (re-search-forward "^\\s-*\\(?:import\\|from\\)\\s-+\\([^ \t\r\n]+\\)" nil t)
-          (push (match-string 1) modules))
+          (push (match-string-no-properties 1) modules))
         (reverse modules)))))
 
 (defun helm-pydoc--init ()
   (with-current-buffer (helm-candidate-buffer 'global)
-    (let ((cmd (concat (helm-pydoc--python) " " helm-pydoc--collect-command)))
-      (unless (zerop (call-process-shell-command cmd nil t))
-        (error "Failed helm-pydoc--init")))))
+    (unless (zerop (call-process (helm-pydoc--python) nil t nil
+                                 helm-pydoc--collect-command))
+      (error "Failed helm-pydoc--init"))))
 
 (defsubst helm-pydoc--pydoc-buffer (module)
   (get-buffer-create (format "*Pydoc %s*" module)))
@@ -73,23 +72,22 @@
   (with-current-buffer (helm-pydoc--pydoc-buffer module)
     (view-mode -1)
     (erase-buffer)
-    (let ((cmd (concat (helm-pydoc--python) " -m pydoc " module)))
-      (unless (zerop (call-process-shell-command cmd nil t))
-        (error (format "Failed: '%s'" cmd)))
-      (goto-char (point-min))
-      (view-mode +1)
-      (pop-to-buffer (current-buffer)))))
+    (unless (zerop (call-process (helm-pydoc--python) nil t nil "-m" "pydoc" module))
+      (error "Failed: 'pydoc'"))
+    (goto-char (point-min))
+    (view-mode +1)
+    (pop-to-buffer (current-buffer))))
 
 (defun helm-pydoc--module-file (module)
   (with-temp-buffer
-    (let* ((cmd (format "%s -c 'import %s;print(%s.__file__)'"
-                        (helm-pydoc--python) module module)))
-      (unless (zerop (call-process-shell-command cmd nil t))
-        (error (format "Not found module '%s' source code" module)))
+    (let ((import-expression (format "import %s;print(%s.__file__)" module module)))
+      (unless (zerop (call-process (helm-pydoc--python) nil t nil
+                                   "-c" import-expression))
+        (error "Not found module '%s' source code" module))
       (goto-char (point-min))
       (let ((modname (buffer-substring (point) (line-end-position))))
-        (if (string-match "^\\(\.+\\.py\\)c$" modname)
-            (match-string 1 modname)
+        (if (string-match "\\`\\(\.+\\.py\\)c\\'" modname)
+            (match-string-no-properties 1 modname)
           modname)))))
 
 (defun helm-pydoc--view-source (candidate)
@@ -105,7 +103,7 @@
   (cl-loop for module in (helm-marked-candidates)
            when (not (helm-pydoc--check-imported module))
            collect module into modules
-           finally return (sort modules #'string<)))
+           finally return (sort modules 'string<)))
 
 (defun helm-pydoc--construct-import-statement (modules)
   (cond ((null (cdr modules))
@@ -123,9 +121,9 @@
 
 (defun helm-pydoc--skip-comments ()
   (goto-char (point-min))
-  (cl-loop while (string-match "^#" (buffer-substring-no-properties
-                                     (line-beginning-position)
-                                     (line-end-position)))
+  (cl-loop while (string-match-p "\\`#" (buffer-substring-no-properties
+                                         (line-beginning-position)
+                                         (line-end-position)))
            do
            (forward-line 1)))
 
@@ -182,8 +180,7 @@
 (defun helm-pydoc ()
   (interactive)
   (helm :sources '(helm-pydoc--imported-source helm-pydoc--installed-source)
-        :buffer (get-buffer-create "*helm pydoc*")
-        :history 'helm-pydoc--history))
+        :buffer "*helm pydoc*" :history 'helm-pydoc--history))
 
 (provide 'helm-pydoc)
 
