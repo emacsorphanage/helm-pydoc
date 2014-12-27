@@ -53,5 +53,5 @@ is found in this directory hierarchy.
 ```elisp
 (eval-after-load "python"
   '(progn
-     (define-key pythom-mode-map (kbd "C-c C-d") 'helm-pydoc)))
+     (define-key python-mode-map (kbd "C-c C-d") 'helm-pydoc)))
 ```
