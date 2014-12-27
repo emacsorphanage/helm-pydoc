@@ -1,4 +1,4 @@
-# helm-pydoc.el
+# helm-pydoc.el [![melpa badge][melpa-badge]][melpa-link] [![melpa stable badge][melpa-stable-badge]][melpa-stable-link]
 
 ## Introduction
 `helm-pydoc.el` is pydoc helm interface
@@ -50,8 +50,13 @@ is found in this directory hierarchy.
 
 ## Sample Configuration
 
-```elisp
+```lisp
 (eval-after-load "python"
   '(progn
      (define-key python-mode-map (kbd "C-c C-d") 'helm-pydoc)))
 ```
+
+[melpa-link]: http://melpa.org/#/helm-pydoc
+[melpa-stable-link]: http://melpa.org/#/helm-pydoc
+[melpa-badge]: http://melpa.org/packages/helm-pydoc-badge.svg
+[melpa-stable-badge]: http://stable.melpa.org/packages/helm-pydoc-badge.svg
