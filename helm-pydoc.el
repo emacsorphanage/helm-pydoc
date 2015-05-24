@@ -26,6 +26,7 @@
 
 (require 'cl-lib)
 (require 'helm)
+(require 'python)
 
 (defgroup helm-pydoc nil
   "Pydoc with helm interface"
@@ -48,7 +49,7 @@
       (if venv
           (concat (expand-file-name (file-name-as-directory venv))
                   helm-pydoc-virtualenv "/bin/python")
-        "python"))))
+        python-shell-interpreter))))
 
 (defun helm-pydoc--collect-imported-modules ()
   (with-helm-current-buffer
