@@ -48,7 +48,9 @@
            (venv (locate-dominating-file file helm-pydoc-virtualenv)))
       (if venv
           (concat (expand-file-name (file-name-as-directory venv))
-                  helm-pydoc-virtualenv "/bin/python")
+                  helm-pydoc-virtualenv (if (eq system-type 'windows-nt)
+                                            "/Scripts/python"
+                                          "/bin/python"))
         python-shell-interpreter))))
 
 (defun helm-pydoc--collect-imported-modules ()
