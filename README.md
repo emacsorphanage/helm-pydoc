@@ -13,8 +13,8 @@
 
 ## Requirements
 
-* Emacs 24 or higher
-* helm 1.0 or higher
+* Emacs 24.3 or higher
+* helm 1.7.4 or higher
 
 ## Installation
 
