@@ -1,5 +1,8 @@
 Revision history for helm-pydoc.el
 
+Revision 0.07 2015/09/19 syohex
+   - Fix virualenv python path on Windows(Thanks alexandre-heaume)
+
 Revision 0.06 2014/07/02 syohex
    - Re-factoring
 
