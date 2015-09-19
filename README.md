@@ -18,7 +18,7 @@
 
 ## Installation
 
-You can install `helm-pydoc.el` from [MELPA](http://melpa.milkbox.net/) with `package.el`
+You can install `helm-pydoc.el` from [MELPA](https://melpa.org/) with `package.el`
 
 ```
  M-x package-install helm-pydoc
@@ -56,7 +56,7 @@ is found in this directory hierarchy.
      (define-key python-mode-map (kbd "C-c C-d") 'helm-pydoc)))
 ```
 
-[melpa-link]: http://melpa.org/#/helm-pydoc
-[melpa-stable-link]: http://melpa.org/#/helm-pydoc
-[melpa-badge]: http://melpa.org/packages/helm-pydoc-badge.svg
-[melpa-stable-badge]: http://stable.melpa.org/packages/helm-pydoc-badge.svg
+[melpa-link]: https://melpa.org/#/helm-pydoc
+[melpa-stable-link]: https://melpa.org/#/helm-pydoc
+[melpa-badge]: https://melpa.org/packages/helm-pydoc-badge.svg
+[melpa-stable-badge]: https://stable.melpa.org/packages/helm-pydoc-badge.svg
