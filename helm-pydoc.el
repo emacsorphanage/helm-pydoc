@@ -154,28 +154,26 @@
                      candidate imports name)))
     (helm-pydoc--insert-import-statement statement)))
 
-(define-helm-type-attribute 'pydoc
-  '((action . (("Pydoc Module" . helm-pydoc--do-pydoc)
-               ("View Source Code" . helm-pydoc--view-source)
-               ("Import Module(import module)" . helm-pydoc--import-module)
-               ("Import Module(from module import identifiers)"
-                . helm-pydoc--from-import-module)
-               ("Import Module(from module import identifiers as name)"
-                . helm-pydoc--from-import-as-module)))
-    "pydoc helm attribute"))
+(defvar helm-pydoc--actions
+  '(("Pydoc Module" . helm-pydoc--do-pydoc)
+    ("View Source Code" . helm-pydoc--view-source)
+    ("Import Module(import module)" . helm-pydoc--import-module)
+    ("Import Module(from module import identifiers)"
+     . helm-pydoc--from-import-module)
+    ("Import Module(from module import identifiers as name)"
+     . helm-pydoc--from-import-as-module)))
 
 (defvar helm-pydoc--imported-source
-  '((name . "Imported Modules")
-    (candidates . helm-pydoc--collect-imported-modules)
-    (type . pydoc)
-    (candidate-number-limit . 9999)))
+  (helm-build-sync-source "Imported Modules"
+    :candidates 'helm-pydoc--collect-imported-modules
+    :action helm-pydoc--actions
+    :candidate-number-limit 9999))
 
 (defvar helm-pydoc--installed-source
-  '((name . "Installed Modules")
-    (init . helm-pydoc--init)
-    (candidates-in-buffer)
-    (type . pydoc)
-    (candidate-number-limit . 9999)))
+  (helm-build-in-buffer-source "Installed Modules"
+    :init 'helm-pydoc--init
+    :action helm-pydoc--actions
+    :candidate-number-limit 9999))
 
 (defvar helm-pydoc--history nil)
 
