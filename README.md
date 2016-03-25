@@ -51,9 +51,8 @@ is found in this directory hierarchy.
 ## Sample Configuration
 
 ```lisp
-(eval-after-load "python"
-  '(progn
-     (define-key python-mode-map (kbd "C-c C-d") 'helm-pydoc)))
+(with-eval-after-load "python"
+  (define-key python-mode-map (kbd "C-c C-d") 'helm-pydoc))
 ```
 
 [melpa-link]: https://melpa.org/#/helm-pydoc
