@@ -31,6 +31,13 @@ You can install `helm-pydoc.el` from [MELPA](https://melpa.org/) with `package.e
 
 `pydoc` with helm interface
 
+
+## NOTE
+
+If you use python 2 and set `python-shell-interpreter` to `"ipython"`,
+helm-pydoc.el does not work well. Please use python3 if you set `python-shell-interpreter`
+to `"ipython"`.
+
 ## Customize Variable
 
 #### `helm-pydoc-virtualenv`(Default `"venv"`)
