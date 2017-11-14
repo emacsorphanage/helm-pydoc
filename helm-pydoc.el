@@ -182,6 +182,16 @@
   (helm :sources '(helm-pydoc--imported-source helm-pydoc--installed-source)
         :buffer "*helm pydoc*" :history 'helm-pydoc--history))
 
+;;;###autoload
+(defun helm-pydoc-at-point ()
+  (interactive)
+  (let ((symbol
+	 (if (region-active-p)
+	     (buffer-substring (region-beginning) (region-end))
+	   (current-word))))
+    (helm :sources '(helm-pydoc--imported-source helm-pydoc--installed-source)
+	  :buffer "*helm pydoc*" :history 'helm-pydoc--history :input symbol)))
+
 (provide 'helm-pydoc)
 
 ;;; helm-pydoc.el ends here
