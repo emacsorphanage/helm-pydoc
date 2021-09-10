@@ -177,10 +177,13 @@
 (defvar helm-pydoc--history nil)
 
 ;;;###autoload
-(defun helm-pydoc ()
-  (interactive)
-  (helm :sources '(helm-pydoc--imported-source helm-pydoc--installed-source)
-        :buffer "*helm pydoc*" :history 'helm-pydoc--history))
+(defun helm-pydoc (start end)
+  (interactive "r")
+  (let ((initial-input (when (region-active-p)
+                         (buffer-substring-no-properties start end))))
+    (helm :sources '(helm-pydoc--imported-source helm-pydoc--installed-source)
+          :buffer "*helm pydoc*" :history 'helm-pydoc--history
+          :input initial-input)))
 
 (provide 'helm-pydoc)
 
