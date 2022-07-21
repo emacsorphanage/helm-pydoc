@@ -5,7 +5,7 @@
 ;; Author: Syohei YOSHIDA <syohex@gmail.com>
 ;; URL: https://github.com/syohex/emacs-helm-pydoc
 ;; Version: 0.07
-;; Package-Requires: ((helm-core "2.0") (emacs "24.4"))
+;; Package-Requires: ((helm-core "3.6.0") (emacs "24.4"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 ;;; Code:
 
 (require 'cl-lib)
-(require 'helm)
+(require 'helm-core)
 (require 'python)
 
 (defgroup helm-pydoc nil
